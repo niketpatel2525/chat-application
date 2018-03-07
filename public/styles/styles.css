@@ -58,26 +58,6 @@ body {
   letter-spacing: 3px;
 }
 
-.chatroom {
-  display: none;
-  background: #FBFBFB;
-  width: 80%;
-  margin-left: auto;
-  margin-right: auto;
-  bottom: 0;
-  top: 0;
-  left: 0;
-  right: 0;
-  position: absolute;
-  padding: 0;
-  min-height: 100%;
-}
-
-.chatarea {
-  overflow-y: scroll;
-  height: 90%;
-}
-
 .inputMessage {
   border: 10px solid #000;
   bottom: 0;
@@ -109,6 +89,34 @@ body {
   text-align: center;
 }
 
+ul {
+  list-style: none;
+}
+
+.chatroom {
+  display: none;
+  background: #FBFBFB;
+  width: 80%;
+  margin-left: auto;
+  margin-right: auto;
+  bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  position: absolute;
+  padding: 0;
+  min-height: 100%;
+}
+
+.welcome {
+  height: 10%;
+}
+
+.chatarea {
+  overflow-y: scroll;
+  height: 80%;
+}
+
 .messages {
   margin: 60px;
   padding: 10px 20px 10px 20px;
@@ -118,16 +126,53 @@ body {
   color: gray;
 }
 
-ul {
-  list-style: none;
+.message {
+  width: 100%;
+  height: auto;
+  margin: 5px;
+}
+
+.nice {
+  background: #E4E1E1;
+  height: auto;
+  display: table;
+  margin: 0 0 0 auto;
+  min-height: 40px;
+  line-height: 40px;
+  min-width: 35%;
+  border: solid;
+  border-radius: 15px;
+  padding: 10px;
+  max-width: 65%;
+  word-wrap: break-word;
+}
+
+.left-table {
+  display: table;
+  margin: 0 auto 0 0;
+  max-width: 65%;
+  word-wrap: break-word;
+}
+
+.right-table {
+  display: table;
+  margin: 0 0 0 auto;
+  max-width: 65%;
+  word-wrap: break-word;
+}
+
+.nice::after {
+  clear: both;
+  content: "\A";
+  white-space: pre;
 }
 
 .messageBody {
   color: #000000;
-  font-size: 18px;
+  font-size: 12px;
 }
 
 .username {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold;
 }

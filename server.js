@@ -21,7 +21,7 @@ io.on('connection', function(socket) {
   var useradded = false;
   socket.on('add user', function(username) {
     if (useradded) return;
-    console.log(username + " connected.");
+    // console.log(username + " connected.");
     // store username in the socket session
     socket.username = username;
     numusers++;

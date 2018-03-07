@@ -90,9 +90,11 @@ $(function() {
       options.fade = false;
       $typingMessages.remove();
     }
-    var myclass = 'message';
+    var myclass = 'nice';
     if (options.iamuser) {
-      myclass += ' right';
+      myclass += ' right-table';
+    } else {
+      myclass += ' left-table';
     }
     var $usernameDiv = $('<span class="username"/>')
       .text(data.username + ": ")
@@ -100,10 +102,16 @@ $(function() {
     var $messageBodyDiv = $('<span class="messageBody">')
       .text(data.message);
     var typingClass = data.typing ? 'typing' : '';
-    var $messageDiv = $('<li class="' + myclass + '"/>')
+
+    var $niceblock = $('<div class="' + myclass + '"/>')
       .data('username', data.username)
       .addClass(typingClass)
       .append($usernameDiv, $messageBodyDiv);
+
+    var $messageDiv = $('<li class="message"/>')
+      .data('username', data.username)
+      .addClass(typingClass)
+      .append($niceblock);
     addMessageElement($messageDiv, options);
   }
 
@@ -144,7 +152,7 @@ $(function() {
     } else {
       $messages.append($el);
     }
-    $messages[0].scrollTop = $messages[0].scrollHeight;
+    $('div.chatarea')[0].scrollTop = $('div.chatarea')[0].scrollHeight;
   }
 
   function log(message, options) {
