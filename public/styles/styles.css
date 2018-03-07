@@ -43,7 +43,7 @@ body {
   color: #28a745;
 }
 
-#username {
+#username, #room {
   height: 80px;
   width: 400px;
   background-color: transparent;
@@ -56,6 +56,14 @@ body {
   font-size: 24px;
   font-variant-caps: all-petite-caps;
   letter-spacing: 3px;
+}
+
+#username::after {
+  clear: both;
+}
+
+#room::after {
+  clear: both;
 }
 
 .inputMessage {
@@ -175,4 +183,9 @@ ul {
 .username {
   font-size: 16px;
   font-weight: bold;
+}
+
+.footer {
+  text-align: center;
+  margin: 0 0 auto 0;
 }

@@ -10,56 +10,70 @@ app.get('/', function(req, res) {
   res.sendFile(__dirname + '/index.html');
 });
 
-http.listen(3000, function() {
+http.listen(3000, '0.0.0.0', function() {
   console.log("listening on port *:3000");
 });
 
 
-var numusers = 0;
+// var numusers = 0;
 
 io.on('connection', function(socket) {
   var useradded = false;
-  socket.on('add user', function(username) {
+
+
+  socket.on('add user', function(data) {
     if (useradded) return;
     // console.log(username + " connected.");
     // store username in the socket session
-    socket.username = username;
-    numusers++;
+    socket.username = data.username;
+    if (socket.room)
+      socket.leave(socket.room);
+    socket.room = data.room;
+    socket.join(socket.room);
+
+
+    // numusers++;
+    // socket.numusers = numusers;
+
+    // console.log(io.sockets.adapter.rooms[socket.room + ''].length);
+    var numusers = io.sockets.adapter.rooms[socket.room + ''].length;
+    socket.numusers = numusers;
     useradded = true;
-    socket.emit('login', {
-      numusers: numusers
+    io.sockets.in(socket.room).emit('login', {
+      numusers: socket.numusers
     });
     // broadcast about a user joined chat
-    socket.broadcast.emit('user joined', {
+    socket.broadcast.to(socket.room).emit('user joined', {
       username: socket.username,
-      numusers: numusers
+      numusers: socket.numusers
     });
   });
 
   socket.on('new message', function(data) {
-    socket.broadcast.emit('new message', {
+    socket.broadcast.to(socket.room).emit('new message', {
       username: socket.username,
       message: data
     });
   });
   // let other that user is typing
   socket.on('typing', function() {
-    socket.broadcast.emit('typing', {
+    socket.broadcast.to(socket.room).emit('typing', {
       username: socket.username
     });
   });
   // let other that user stops typing
   socket.on('stop typing', function() {
-    socket.broadcast.emit('stop typing', {
+    socket.broadcast.to(socket.room).emit('stop typing', {
       username: socket.username
     });
   });
   socket.on('disconnect', function() {
-    if (useradded)
-      numusers--;
-    socket.broadcast.emit('user left', {
+    // if (useradded)
+    //   numusers--;    
+    socket.numusers = socket.numusers - 1;
+    socket.broadcast.to(socket.room).emit('user left', {
       username: socket.username,
-      numusers: numusers
+      numusers: socket.numusers
     });
   });
 });

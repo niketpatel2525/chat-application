@@ -9,25 +9,29 @@ $(function() {
 
   // initialize variables
   var $window = $(window);
+  var $roomInput = $('#room');
   var $usernameInput = $('#username');
   var $messages = $('.messages'); // Message Area
   var $inputMessage = $('.inputMessage');
+  var $welcome = $('#welcomeMSG');
+
 
   var $loginpage = $('.login');
   var $chatpage = $('.chatroom');
 
   // prompt for setting a username
   var username;
+  var room;
   var connected = false;
   var typing = false;
   var lastTypingTime;
-  var $currentInput = $usernameInput.focus();
+  var $currentInput;
 
   var socket = io();
 
   $window.keydown(function(event) {
     if (!(event.ctrlKey || event.metaKey || event.altKey)) {
-      $currentInput.focus();
+      // $currentInput.focus();
     }
 
     if (event.which === 13) {
@@ -45,8 +49,9 @@ $(function() {
   // set clien's username
   function setusername() {
     username = cleanInput($usernameInput.val().trim());
+    room = cleanInput($roomInput.val().trim());
     // if the username is valid
-    if (username) {
+    if (username && room) {
       username = formatUsername(username);
       $loginpage.fadeOut();
       $chatpage.show();
@@ -54,7 +59,10 @@ $(function() {
       $currentInput = $inputMessage.focus();
 
       // Inform server about client
-      socket.emit('add user', username);
+      socket.emit('add user', {
+        username: username,
+        room: room
+      });
     }
   }
 
@@ -194,7 +202,7 @@ $(function() {
     updateTyping();
   });
   $loginpage.click(function() {
-    $currentInput.focus();
+    // $currentInput.focus();
   });
   $inputMessage.click(function() {
     $inputMessage.focus();
@@ -215,12 +223,14 @@ $(function() {
     log(message, {
       prepend: true
     });
+    $welcome.text('Welcome ' + cleanInput($usernameInput.val().trim()) + " to the chat Room-" + cleanInput($roomInput.val().trim()));
     addParticipantsMessage(data);
   });
   socket.on('new message', function(data) {
     addChatMessage(data);
   });
   socket.on('user joined', function(data) {
+    console.log("User Joined");
     log(data.username + ' joined');
     addParticipantsMessage(data);
   });
