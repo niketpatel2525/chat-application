@@ -4,7 +4,11 @@
   "description": "chat application between client.",
   "dependencies": {
     "express": "^4.15.2",
+    "express-session": "^1.15.6",
+    "express-socket.io-session": "^1.3.3",
+    "fs": "0.0.1-security",
     "npm": "^5.7.1",
-    "socket.io": "^2.0.4"
+    "socket.io": "^2.0.4",
+    "socket.io-stream": "^0.9.1"
   }
 }

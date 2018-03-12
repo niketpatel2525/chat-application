@@ -15,6 +15,7 @@ $(function() {
   var $inputMessage = $('.inputMessage');
   var $welcome = $('#welcomeMSG');
 
+  var $imageButton = $('.imageButton');
 
   var $loginpage = $('.login');
   var $chatpage = $('.chatroom');
@@ -26,7 +27,7 @@ $(function() {
   var typing = false;
   var lastTypingTime;
   var $currentInput;
-
+  var imgchunks = [];
   var socket = io();
 
   $window.keydown(function(event) {
@@ -43,6 +44,50 @@ $(function() {
         setusername();
       }
     }
+  });
+
+
+  $imageButton.click(function() {
+    console.log("Clicked");
+    $('#file').click();
+    $("#file").change(function(e) {
+      //  var file = URL.createObjectURL(e.target.files[0]);
+      var file = e.target.files[0];
+      // $('.myImage').attr('src', URL.createObjectURL(file));
+
+      addChatMessage({
+        username: username,
+        image: URL.createObjectURL(file)
+      }, {
+        iamuser: true,
+        isImage: true
+      });
+
+
+      var stream = ss.createStream({
+        highWaterMark: 145788
+
+      });
+      stream.forceBase64 = true;
+      console.log(file);
+      ss(socket).emit('file', stream, {
+        name: file.name,
+        size: file.size
+      });
+
+      var size = 0;
+      var blobStream = ss.createBlobReadStream(file);
+      blobStream.on('data', function(chunk) {
+        size += chunk.length;
+        console.log(Math.floor(size / file.size * 100) + '%');
+      });
+
+      blobStream.pipe(stream).on('finish', function() {
+        console.log("Image Sent");
+      });
+
+      console.log(file);
+    });
   });
 
 
@@ -107,8 +152,13 @@ $(function() {
     var $usernameDiv = $('<span class="username"/>')
       .text(data.username + ": ")
       .css('color', getUsernameColor(data.username));
-    var $messageBodyDiv = $('<span class="messageBody">')
-      .text(data.message);
+    var $messageBodyDiv;
+    if (options.isImage) {
+      $messageBodyDiv = $('<img class="imageMessage">').attr('src', data.image);
+    } else {
+      $messageBodyDiv = $('<span class="messageBody">')
+        .text(data.message);
+    }
     var typingClass = data.typing ? 'typing' : '';
 
     var $niceblock = $('<div class="' + myclass + '"/>')
@@ -120,6 +170,8 @@ $(function() {
       .data('username', data.username)
       .addClass(typingClass)
       .append($niceblock);
+
+
     addMessageElement($messageDiv, options);
   }
 
@@ -229,6 +281,29 @@ $(function() {
   socket.on('new message', function(data) {
     addChatMessage(data);
   });
+
+
+
+  socket.on('imageMessage', function(stream) {
+    console.log("Receiving");
+    if (stream.isLoading) {
+      imgchunks.push(stream.chunk);
+    } else {
+      addChatMessage({
+        username: stream.username,
+        image: 'data:image/png;base64,' + window.btoa(imgchunks)
+      }, {
+        isImage: true
+      });
+      imgchunks = []
+    }
+  });
+
+
+  ss(socket).on('image file', function(stream, data) {
+    console.log("Incoming Data");
+  });
+
   socket.on('user joined', function(data) {
     console.log("User Joined");
     log(data.username + ' joined');

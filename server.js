@@ -3,6 +3,9 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var path = require('path');
+var fs = require('fs');
+var ss = require('socket.io-stream');
+
 
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -17,14 +20,62 @@ http.listen(3000, '0.0.0.0', function() {
 
 // var numusers = 0;
 
+var storageserver = __dirname + "/storage/";
 io.on('connection', function(socket) {
   var useradded = false;
+
+  ss(socket).on('file', function(stream, data) {
+    // var filename = path.basename(data.name);
+    if (!fs.existsSync(storageserver)) {
+      fs.mkdirSync(storageserver);
+    }
+    var ext = path.extname(data.name);
+    var filename = new Date().getTime() + ext;
+    console.log(filename);
+
+
+    var write = fs.createWriteStream(storageserver + filename);
+
+    stream.pipe(write).on('finish', function() {
+      console.log("Broadcasting Image....");
+      var readStream = fs.createReadStream(storageserver + filename, {
+          encoding: 'binary'
+        }),
+        chunks = [],
+        delay = 0;
+      readStream.on('readable', function() {
+        console.log('Image loading');
+      });
+      readStream.on('data', function(chunk) {
+        chunks.push(chunk);
+        socket.broadcast.to(socket.room).emit('imageMessage', {
+          username: socket.username,
+          chunk: chunk,
+          isLoading: true
+        });
+      });
+      readStream.on('end', function() {
+        console.log('Image loaded');
+        socket.broadcast.to(socket.room).emit('imageMessage', {
+          username: socket.username,
+          isLoading: false
+        });
+      });
+
+    });
+  });
+
+
 
 
   socket.on('add user', function(data) {
     if (useradded) return;
+
+
     // console.log(username + " connected.");
     // store username in the socket session
+
+
     socket.username = data.username;
     if (socket.room)
       socket.leave(socket.room);
@@ -69,7 +120,7 @@ io.on('connection', function(socket) {
   });
   socket.on('disconnect', function() {
     // if (useradded)
-    //   numusers--;    
+    //   numusers--;
     socket.numusers = socket.numusers - 1;
     socket.broadcast.to(socket.room).emit('user left', {
       username: socket.username,
