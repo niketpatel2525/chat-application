@@ -65,10 +65,11 @@ $(function() {
 
 
       var stream = ss.createStream({
-        highWaterMark: 145788
-
+        highWaterMark: file.size + 1024,
+        objectMode: true,
+        encoding: 'binary'
       });
-      stream.forceBase64 = true;
+      // stream.forceBase64 = true;
       console.log(file);
       ss(socket).emit('file', stream, {
         name: file.name,
@@ -76,17 +77,17 @@ $(function() {
       });
 
       var size = 0;
-      var blobStream = ss.createBlobReadStream(file);
-      blobStream.on('data', function(chunk) {
-        size += chunk.length;
-        console.log(Math.floor(size / file.size * 100) + '%');
-      });
+      // var blobStream = ss.createBlobReadStream(file);
+      // blobStream.on('data', function(chunk) {
+      //   size += chunk.length;
+      //   console.log(Math.floor(size / file.size * 100) + '%');
+      // });
 
-      blobStream.pipe(stream).on('finish', function() {
+      ss.createBlobReadStream(file, {
+        highWaterMark: file.size + 1024
+      }).pipe(stream).on('finish', function() {
         console.log("Image Sent");
       });
-
-      console.log(file);
     });
   });
 
@@ -282,22 +283,47 @@ $(function() {
     addChatMessage(data);
   });
 
+  ss(socket).on('imageMessage', function(stream, data) {
+    console.log("Receiving data");
+    var binaryString = "";
+    var ext = data.ext;
+    var usr = data.username;
+    console.log("My EXT:" + ext);
 
-
-  socket.on('imageMessage', function(stream) {
-    console.log("Receiving");
-    if (stream.isLoading) {
-      imgchunks.push(stream.chunk);
-    } else {
+    stream.on('data', function(data) {
+      console.log("data");
+      // imgchunks += data;
+      for (var i = 0; i < data.length; i++) {
+        binaryString += String.fromCharCode(data[i]);
+      }
+    });
+    stream.on('end', function() {
+      console.log("End Receiving");
       addChatMessage({
-        username: stream.username,
-        image: 'data:image/png;base64,' + window.btoa(imgchunks)
+        username: usr,
+        image: 'data: image/' + ext + ';base64,' +
+          window.btoa(binaryString)
       }, {
         isImage: true
       });
-      imgchunks = []
-    }
+      binaryString = "";
+    });
   });
+
+  // socket.on('imageMessage', function(stream) {
+  //   console.log("Receiving");
+  //   if (stream.isLoading) {
+  //     imgchunks.push(stream.chunk);
+  //   } else {
+  //     addChatMessage({
+  //       username: stream.username,
+  //       image: 'data:image/png;base64,' + window.btoa(imgchunks)
+  //     }, {
+  //       isImage: true
+  //     });
+  //     imgchunks = []
+  //   }
+  // });
 
 
   ss(socket).on('image file', function(stream, data) {
