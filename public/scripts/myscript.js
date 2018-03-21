@@ -50,6 +50,7 @@ $(function() {
   $imageButton.click(function() {
     console.log("Clicked");
     $('#file').click();
+    $('#file').off().on('click');
     $("#file").change(function(e) {
       //  var file = URL.createObjectURL(e.target.files[0]);
       var file = e.target.files[0];
