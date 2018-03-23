@@ -52,7 +52,7 @@ npm install socket.io-stream --save
 
 - Screenshot 4
 
-![Screenshot 4](https://github.com/niketpatel2525/chat-application/blob/master/screenshot/ss%204.png)
+![Screenshot 4](https://github.com/niketpatel2525/chat-application/blob/master/screenshot/ss%2044.png)
 
 - Screenshot 5
 
