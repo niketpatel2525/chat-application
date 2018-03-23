@@ -38,3 +38,18 @@ npm install socket.io-stream --save
 
 ## Screenshots
 
+- screenshot 1
+
+![Screenshot 1](https://github.com/niketpatel2525/chat-application/blob/master/screenshot/ss%201.png)
+
+- Screenshot 2
+
+![Screenshot 2](https://github.com/niketpatel2525/chat-application/blob/master/screenshot/ss%202.png)
+
+- Screenshot 3
+
+![Screenshot 3](https://github.com/niketpatel2525/chat-application/blob/master/screenshot/ss%203.png)
+
+- Screenshot 4
+
+![Screenshot 4](https://github.com/niketpatel2525/chat-application/blob/master/screenshot/ss%204.png)
